@@ -1,17 +1,14 @@
 // Button handlers
 document.getElementById("groupNow").addEventListener("click", () => {
   chrome.runtime.sendMessage({ type: "GROUP_ALL_TABS" });
-  updateStats();
 });
 
 document.getElementById("groupUngrouped").addEventListener("click", () => {
   chrome.runtime.sendMessage({ type: "GROUP_UNGROUPED_TABS" });
-  updateStats();
 });
 
 document.getElementById("ungroupAll").addEventListener("click", () => {
   chrome.runtime.sendMessage({ type: "UNGROUP_ALL_TABS" });
-  updateStats();
 });
 
 // Settings handlers
@@ -56,25 +53,8 @@ async function loadSettings() {
   });
 }
 
-// Stats update
-async function updateStats() {
-  return new Promise((resolve) => {
-    chrome.runtime.sendMessage({ type: "GET_STATS" }, (stats) => {
-      if (stats) {
-        document.getElementById("totalTabs").textContent = stats.totalTabs;
-        document.getElementById("groupedTabs").textContent = stats.groupedTabs;
-        document.getElementById("ungroupedTabs").textContent =
-          stats.ungroupedTabs;
-        document.getElementById("totalGroups").textContent = stats.totalGroups;
-      }
-      resolve();
-    });
-  });
-}
-
 // Initialize
 async function init() {
-  await updateStats();
   const settings = await loadSettings();
 
   // Set toggle states
@@ -89,9 +69,6 @@ async function init() {
   }
 
   setupToggleHandlers();
-
-  // Refresh stats every 1 second while popup is open
-  setInterval(updateStats, 1000);
 }
 
 init();

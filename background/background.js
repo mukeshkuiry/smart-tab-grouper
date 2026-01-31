@@ -115,20 +115,6 @@ async function ungroupAllTabs() {
   colorIndex = 0;
 }
 
-async function getGroupStats() {
-  const tabs = await chrome.tabs.query({});
-  const groups = await chrome.tabGroups.query({});
-  const grouped = tabs.filter(
-    (t) => t.groupId && t.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE,
-  ).length;
-  return {
-    totalTabs: tabs.length,
-    groupedTabs: grouped,
-    ungroupedTabs: tabs.length - grouped,
-    totalGroups: groups.length,
-  };
-}
-
 async function groupUngroupedTabs() {
   const tabs = await chrome.tabs.query({});
   const buckets = {};
@@ -172,7 +158,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       if (msg.type === "GROUP_ALL_TABS") await groupAllTabs();
       else if (msg.type === "UNGROUP_ALL_TABS") await ungroupAllTabs();
       else if (msg.type === "GROUP_UNGROUPED_TABS") await groupUngroupedTabs();
-      else if (msg.type === "GET_STATS") sendResponse(await getGroupStats());
       else if (msg.type === "GET_SETTINGS") sendResponse(await getSettings());
       else if (msg.type === "SAVE_SETTINGS") {
         await saveSettings(msg.settings);

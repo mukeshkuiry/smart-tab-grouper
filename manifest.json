@@ -18,8 +18,8 @@
   "commands": {
     "group-all-tabs": {
       "suggested_key": {
-        "default": "Ctrl+Shift+H",
-        "mac": "Command+Shift+H"
+        "default": "Ctrl+Shift+K",
+        "mac": "Command+Shift+K"
       },
       "description": "Group all tabs by hostname"
     },
@@ -32,8 +32,8 @@
     },
     "group-ungrouped-tabs": {
       "suggested_key": {
-        "default": "Ctrl+Shift+T",
-        "mac": "Command+Shift+T"
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
       },
       "description": "Group only ungrouped tabs"
     }
