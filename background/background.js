@@ -172,5 +172,3 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   return true;
 });
-
-// removed chrome.commands.onCommand listener as shortcuts are no longer supported
