@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 280px;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        button {
+            padding: 10px 8px;
+            border: none;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-danger {
+            background: rgba(255, 0, 0, 0.3);
+            color: #fff;
+            border: 1px solid rgba(255, 0, 0, 0.4);
+            grid-column: span 2;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 0, 0, 0.4);
+        }
+
+        .stats-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 11px;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-weight: 700;
+        }
+
+        .settings-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 11px;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            flex: 1;
+        }
+
+        .toggle {
+            width: 36px;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 9px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .toggle.active {
+            background: #4caf50;
+        }
+
+        .toggle-switch {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle.active .toggle-switch {
+            left: 20px;
+        }
+
+        .shortcut-hint {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 8px;
+            margin-top: 12px;
+            font-size: 9px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">Tab Grouper</div>
+
+    <div class="button-group">
+        <button id="groupNow" class="btn-primary">Group All</button>
+        <button id="groupUngrouped" class="btn-secondary">Group New</button>
+        <button id="ungroupAll" class="btn-danger">Ungroup All</button>
+    </div>
+
+    <div class="stats-box" id="statsBox">
+        <div class="stat-row">
+            <span class="stat-label">Total</span>
+            <span class="stat-value" id="totalTabs">0</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Grouped</span>
+            <span class="stat-value" id="groupedTabs">0</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Ungrouped</span>
+            <span class="stat-value" id="ungroupedTabs">0</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Groups</span>
+            <span class="stat-value" id="totalGroups">0</span>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <div class="setting-item">
+            <span class="setting-label">Auto Group</span>
+            <div id="toggleAutoGroup" class="toggle active">
+                <div class="toggle-switch"></div>
+            </div>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Smart Colors</span>
+            <div id="toggleSmartColoring" class="toggle active">
+                <div class="toggle-switch"></div>
+            </div>
+        </div>
+        <div class="setting-item">
+            <span class="setting-label">Collapse</span>
+            <div id="toggleCollapsed" class="toggle">
+                <div class="toggle-switch"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="shortcut-hint">
+        <strong>Shortcuts:</strong><br>
+        ⌘+Shift+H: Group All<br>
+        ⌘+Shift+U: Ungroup<br>
+        ⌘+Shift+T: Group New
+    </div>
+
+    <script src="popup.js" type="module"></script>
+</body>
+
+</html>
