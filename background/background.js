@@ -172,9 +172,3 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   return true;
 });
-
-chrome.commands.onCommand.addListener(async (command) => {
-  if (command === "group-all-tabs") await groupAllTabs();
-  else if (command === "ungroup-all-tabs") await ungroupAllTabs();
-  else if (command === "group-ungrouped-tabs") await groupUngroupedTabs();
-});

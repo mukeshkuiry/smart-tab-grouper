@@ -18,15 +18,9 @@ A sleek and powerful Chrome extension that automatically groups tabs by hostname
 
 ### 🎯 **Manual Controls**
 
-- **Group All Tabs**: Organize all open tabs by hostname
-- **Group New Tabs**: Only group tabs that aren't already in a group
-- **Ungroup All**: Remove all tab groups with one click
-
-### ⌨️ **Keyboard Shortcuts**
-
-- `Cmd+Shift+E` / `Ctrl+Shift+E` - Group all tabs
-- `Cmd+Shift+U` / `Ctrl+Shift+U` - Ungroup all tabs
-- `Cmd+Shift+Y` / `Ctrl+Shift+Y` - Group ungrouped tabs
+- **Group All Tabs**: Organize all open tabs by hostname (via popup button)
+- **Group New Tabs**: Only group tabs that aren't already in a group (via popup button)
+- **Ungroup All**: Remove all tab groups with one click (via popup button)
 
 ### ⚙️ **Customizable Settings**
 
@@ -64,14 +58,13 @@ A sleek and powerful Chrome extension that automatically groups tabs by hostname
 
 1. Install the extension
 2. Open some tabs from different websites
-3. Click the extension icon or use `Cmd+Shift+E` to group all tabs
-4. Tabs will be automatically organized by hostname
+3. Click the extension icon and use the popup buttons to group or ungroup tabs
+4. Tabs will be automatically organized by hostname if auto-grouping is enabled
 
 ### Advanced Usage
 
 - **Auto-grouping**: Enable in settings for automatic organization as you browse
 - **Manual grouping**: Use the popup buttons for specific control
-- **Keyboard shortcuts**: Quick actions without opening the popup
 - **Per-window groups**: Each browser window maintains its own groups
 
 ## 🔧 Configuration
@@ -175,11 +168,6 @@ If you have any questions or issues:
 - Make sure you're using Chrome
 - Check that the extension is enabled in `chrome://extensions/`
 - Try reloading the extension
-
-**Keyboard shortcuts not working?**
-
-- Check that no other extensions are using the same shortcuts
-- Go to `chrome://extensions/shortcuts` to customize
 
 **Auto-grouping not working?**
 
