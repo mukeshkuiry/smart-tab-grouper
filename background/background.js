@@ -27,9 +27,17 @@ function nextColor() {
 function getHostname(url) {
   try {
     return new URL(url).hostname.toLowerCase();
-  } catch (err) {
+  } catch {
     return null;
   }
+}
+
+async function updateGroupTitle(groupId, hostname) {
+  const tabs = await chrome.tabs.query({ groupId });
+
+  await chrome.tabGroups.update(groupId, {
+    title: `${hostname} (${tabs.length})`,
+  });
 }
 
 async function getOrCreateGroup(hostname, tabIds) {
@@ -44,26 +52,33 @@ async function getOrCreateGroup(hostname, tabIds) {
 
   if (perWindow.has(windowId)) {
     const cachedGroupId = perWindow.get(windowId);
+
     try {
       const groupInfo = await chrome.tabGroups.get(cachedGroupId);
+
       if (groupInfo && groupInfo.windowId === windowId) {
         await chrome.tabs.group({ groupId: cachedGroupId, tabIds });
+
+        await updateGroupTitle(cachedGroupId, hostname);
+
         return cachedGroupId;
       }
-    } catch (err) {
-      // fall through
-    }
+    } catch {}
   }
 
   const newGroupId = await chrome.tabs.group({ tabIds });
+
   const settings = await getSettings();
+
   await chrome.tabGroups.update(newGroupId, {
-    title: hostname,
     color: settings.smartColoring ? nextColor() : undefined,
     collapsed: settings.collapsedByDefault,
   });
 
+  await updateGroupTitle(newGroupId, hostname);
+
   perWindow.set(windowId, newGroupId);
+
   return newGroupId;
 }
 
@@ -71,17 +86,22 @@ async function rebuildGroupCache() {
   try {
     const groups = await chrome.tabGroups.query({});
     groupCache.clear();
+
     for (const g of groups) {
       const title = g.title?.toLowerCase();
       if (!title) continue;
-      let perWindow = groupCache.get(title);
+
+      const hostname = title.split(" (")[0];
+
+      let perWindow = groupCache.get(hostname);
       if (!perWindow) {
         perWindow = new Map();
-        groupCache.set(title, perWindow);
+        groupCache.set(hostname, perWindow);
       }
+
       perWindow.set(g.windowId, g.id);
     }
-  } catch (e) {}
+  } catch {}
 }
 
 rebuildGroupCache();
@@ -91,20 +111,22 @@ async function groupAllTabs() {
   const buckets = {};
 
   for (const tab of tabs) {
-    if (!tab.url || !tab.url.startsWith("http")) continue;
+    if (!tab.url?.startsWith("http")) continue;
+
     const hostname = getHostname(tab.url);
     if (!hostname) continue;
-    if (!buckets[hostname]) buckets[hostname] = [];
-    buckets[hostname].push(tab.id);
+
+    (buckets[hostname] ||= []).push(tab.id);
   }
 
-  for (const [hostname, tabIds] of Object.entries(buckets)) {
-    await getOrCreateGroup(hostname, tabIds);
+  for (const [hostname, ids] of Object.entries(buckets)) {
+    await getOrCreateGroup(hostname, ids);
   }
 }
 
 async function ungroupAllTabs() {
   const tabs = await chrome.tabs.query({});
+
   for (const tab of tabs) {
     if (tab.groupId && tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE) {
       await chrome.tabs.ungroup(tab.id);
@@ -122,22 +144,25 @@ async function groupUngroupedTabs() {
   for (const tab of tabs) {
     if (tab.groupId && tab.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE)
       continue;
-    if (!tab.url || !tab.url.startsWith("http")) continue;
+
+    if (!tab.url?.startsWith("http")) continue;
+
     const hostname = getHostname(tab.url);
     if (!hostname) continue;
-    if (!buckets[hostname]) buckets[hostname] = [];
-    buckets[hostname].push(tab.id);
+
+    (buckets[hostname] ||= []).push(tab.id);
   }
 
-  for (const [hostname, tabIds] of Object.entries(buckets)) {
-    await getOrCreateGroup(hostname, tabIds);
+  for (const [hostname, ids] of Object.entries(buckets)) {
+    await getOrCreateGroup(hostname, ids);
   }
 }
 
 chrome.tabs.onCreated.addListener(async (tab) => {
   const settings = await getSettings();
   if (!settings.autoGroup) return;
-  if (tab.url && tab.url.startsWith("http")) {
+
+  if (tab.url?.startsWith("http")) {
     const hostname = getHostname(tab.url);
     if (hostname) await getOrCreateGroup(hostname, [tab.id]);
   }
@@ -146,7 +171,8 @@ chrome.tabs.onCreated.addListener(async (tab) => {
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
   const settings = await getSettings();
   if (!settings.autoGroup) return;
-  if (changeInfo.url && changeInfo.url.startsWith("http")) {
+
+  if (changeInfo.url?.startsWith("http")) {
     const hostname = getHostname(changeInfo.url);
     if (hostname) await getOrCreateGroup(hostname, [tabId]);
   }
@@ -164,9 +190,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         sendResponse({ success: true });
       }
     } catch (err) {
-      try {
-        sendResponse({ error: err?.message || String(err) });
-      } catch (e) {}
+      sendResponse({ error: err?.message || String(err) });
     }
   })();
 
